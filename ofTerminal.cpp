@@ -13,7 +13,7 @@ void ofTerminal::setup(){
 	spaceWidth = characterWidth-1;
 	printf("characterWidth = %i\n", characterWidth);
 	cl = 0;
-	promptString = "sybil:$ ";
+	promptString = "whg@sybil:$ ";
 	lines.push_back("");
 	results.push_back("");
 	stringWidth = characterWidth*8;
@@ -225,7 +225,7 @@ void ofTerminal::process(string command) {
 			comment = "you wrote take";
 		}
 		else {
-			comment = tokens[0] +	": command not found";
+			comment = "-sybil: " + tokens[0] +	": command not found";
 		}
 		
 		//show the comment, if there is one and inc promt.y

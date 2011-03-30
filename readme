@@ -9,4 +9,5 @@ trying to emulate bash.
 so far you can:
 
 move along lines, editing text
+use up and down for previous commands
 use tab to autocomplete 
