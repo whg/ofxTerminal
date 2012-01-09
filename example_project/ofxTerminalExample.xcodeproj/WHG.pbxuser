@@ -56,14 +56,14 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 347736968;
-			PBXWorkspaceStateSaveDate = 347736968;
+			PBXPerProjectTemplateStateSaveDate = 347761585;
+			PBXWorkspaceStateSaveDate = 347761585;
 		};
 		perUserProjectItems = {
-			EE5615B714B9EFE6000DE70A = EE5615B714B9EFE6000DE70A /* PBXTextBookmark */;
-			EE5615B814B9EFE6000DE70A = EE5615B814B9EFE6000DE70A /* PBXTextBookmark */;
-			EE5615B914B9EFE6000DE70A = EE5615B914B9EFE6000DE70A /* PBXTextBookmark */;
-			EE5615BA14B9EFE6000DE70A = EE5615BA14B9EFE6000DE70A /* PBXTextBookmark */;
+			EE5615B714B9EFE6000DE70A /* PBXTextBookmark */ = EE5615B714B9EFE6000DE70A /* PBXTextBookmark */;
+			EE5615B814B9EFE6000DE70A /* PBXTextBookmark */ = EE5615B814B9EFE6000DE70A /* PBXTextBookmark */;
+			EE5615BA14B9EFE6000DE70A /* PBXTextBookmark */ = EE5615BA14B9EFE6000DE70A /* PBXTextBookmark */;
+			EE56166114BA6BC1000DE70A /* PBXTextBookmark */ = EE56166114BA6BC1000DE70A /* PBXTextBookmark */;
 		};
 		sourceControlManager = EE56155614B9EE79000DE70A /* Source Control */;
 		userBuildSettings = {
@@ -91,9 +91,9 @@
 	};
 	E4B69E1F0A3A1BDC003C02F2 /* testApp.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {678, 464}}";
-			sepNavSelRange = "{83, 0}";
-			sepNavVisRange = "{0, 272}";
+			sepNavIntBoundsRect = "{{0, 0}, {678, 520}}";
+			sepNavSelRange = "{229, 0}";
+			sepNavVisRange = "{0, 602}";
 		};
 	};
 	EE56152D14B9EE4F000DE70A /* ofxTerminalExample */ = {
@@ -160,16 +160,6 @@
 		vrLen = 237;
 		vrLoc = 0;
 	};
-	EE5615B914B9EFE6000DE70A /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = E4B69E1F0A3A1BDC003C02F2 /* testApp.h */;
-		name = "testApp.h: 14";
-		rLen = 0;
-		rLoc = 203;
-		rType = 0;
-		vrLen = 245;
-		vrLoc = 0;
-	};
 	EE5615BA14B9EFE6000DE70A /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
 		fRef = E4B69E1F0A3A1BDC003C02F2 /* testApp.h */;
@@ -178,6 +168,16 @@
 		rLoc = 229;
 		rType = 0;
 		vrLen = 245;
+		vrLoc = 0;
+	};
+	EE56166114BA6BC1000DE70A /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = E4B69E1F0A3A1BDC003C02F2 /* testApp.h */;
+		name = "testApp.h: 19";
+		rLen = 0;
+		rLoc = 229;
+		rType = 0;
+		vrLen = 602;
 		vrLoc = 0;
 	};
 }

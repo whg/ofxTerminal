@@ -1,7 +1,7 @@
 ofxTerminal
 ===========
 
-ofxTerminal allows you to control your openFrameworks app using a command line. Function pointers are passed to ofxTerminal, which binds them to specified words. ofxTerminal supports things like autocompletion via tab, command history via up and down keys and other thing you expect from a terminal such as a blinking cursor.
+ofxTerminal allows you to control your openFrameworks apps using a command line. Function pointers are passed to ofxTerminal, which binds them to specified words. ofxTerminal supports things like autocompletion via tab, command history via up and down keys and other thing you expect from a terminal such as a blinking cursor.
 
 Usage
 -----
