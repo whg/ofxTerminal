@@ -40,11 +40,11 @@ Controls
 
 You can use a few control-key combos, it's the usual stuff like:
 
-*C-e* : Move point to the end of the line
-*C-a* : Move point to the beginning of the line
-*C-u* : clear current line
-*C-h* : hide the whole thing
-*C-c* : clear the screen
+* **C-e** : Move point to the end of the line.
+* **C-a** : Move point to the beginning of the line
+* **C-u** : clear current line
+* **C-h** : hide the whole thing
+* **C-c** : clear the screen
 
 Custom Settings
 ---------------
