@@ -46,6 +46,7 @@ typedef struct {
 	int x, y, yOffset;
 	int index;
 	string PS1;
+	unsigned char color[3];
 } Prompt;
 
 
@@ -64,7 +65,8 @@ private:
 	bool blinkCursor, blinker;
 	float blinkFrequency;
 	int blinkCounter;
-	
+	unsigned char fontcolor[3];
+	bool ishidden;
 	float characterOffset, spaceOffset;
 	
 	vector<string> lines, results;
@@ -100,6 +102,8 @@ public:
 	void setCharacterOffset(float v);
 	void setSpaceOffset(float v);
 	void setBlinkingCursor(bool b, float freq);
+	void setFontColor(int r, int g, int b);
+	void setPromptColor(int r, int g, int b);
 };
 
 
@@ -128,7 +132,8 @@ ofxTerminal<T>::ofxTerminal(T *co, string fontpath="/System/Library/Fonts/Menlo.
 	ofEnableAlphaBlending();
 }
 
-//empty default constructor, should never be used
+//empty default constructor, for when ofxTerminal is located on the stack
+//this should never be explicitly called.
 template <class T> ofxTerminal<T>::ofxTerminal() {}
 
 template <class T>
@@ -152,11 +157,16 @@ void ofxTerminal<T>::setup() {
 	blinker = true;
 	blinkFrequency = 0.5;
 	blinkCounter = 0;
+	fontcolor[0] = fontcolor[1] = fontcolor[2] = 10;
+	prompt.color[0] = prompt.color[1] = prompt.color[2] = 50;
+	ishidden = false;
 }
 
 
 template <class T>
 void ofxTerminal<T>::draw(int xOffset=0, int yOffset=-2) {
+	
+	if (ishidden) return;
 		
 	//check to see if we need to move everything up to fit the new line
 	if (prompt.y+lineHeight > ofGetHeight() - screenYPos) {
@@ -172,19 +182,18 @@ void ofxTerminal<T>::draw(int xOffset=0, int yOffset=-2) {
 	int j = 0;
 	for (int i = 0; i < results.size(); i++) {
 		if (results[i] == "") {
-			ofSetColor(10, 10, 10);
+			ofSetColor(fontcolor[0], fontcolor[1], fontcolor[2]);
 			font.drawString(prompt.PS1 + lines[j++], 0, lineHeight*(i+1));
 		} 
 		//draw results/comments
 		else {
-			ofSetColor(100, 100, 100);
+			ofSetColor(fontcolor[0]*8, fontcolor[1]*8, fontcolor[2]*8);
 			font.drawString(results[i], 0, lineHeight*(i+1));
 		}		
 	}	
-	cout << ofGetElapsedTimeMillis() << endl;
 	
 	//this is where we draw the prompt
-	ofSetColor(50, 50, 50, blinker ? 100 : 0); //make the prompt a transparent grey
+	ofSetColor(prompt.color[0], prompt.color[1], prompt.color[2], blinker ? 100 : 0); //make the prompt a transparent grey
 	ofRect(stringWidth(prompt.PS1) + prompt.x, prompt.y, characterWidth, lineHeight);	
 	
 	ofPopMatrix();
@@ -356,6 +365,11 @@ void ofxTerminal<T>::keyPressed(int key) {
 			prompt.x = 0;
 			prompt.index = 0;
 			lines[cl] = "";
+			break;
+
+		//control-h, toggle ishidden, which hides everything
+		case 8:
+			ishidden = !ishidden;
 			break;
 
 		//all other keys...
@@ -576,6 +590,20 @@ void ofxTerminal<T>::setBlinkingCursor(bool b, float freq=0.5) {
 	blinkFrequency = freq;
 	blinker = true; //setting this to true is quite important
 	blinkCounter = ofGetElapsedTimeMillis();
+}
+
+template <class T>
+void ofxTerminal<T>::setFontColor(int r, int g, int b) {	
+	fontcolor[0] = r;
+	fontcolor[1] = g;
+	fontcolor[2] = b;
+}
+
+template <class T>
+void ofxTerminal<T>::setPromptColor(int r, int g, int b) {	
+	prompt.color[0] = r;
+	prompt.color[1] = g;
+	prompt.color[2] = b;
 }
 
 #endif

@@ -35,6 +35,17 @@ The one built in function in ofxTerminal is *read*. This reads files for you and
 
 `terminal.setPath("/Users/some_users/some_thing_here");`
 
+Controls
+--------
+
+You can use a few control-key combos, it's the usual stuff like:
+
+*C-e* : Move point to the end of the line
+*C-a* : Move point to the beginning of the line
+*C-u* : clear current line
+*C-h* : hide the whole thing
+*C-c* : clear the screen
+
 Custom Settings
 ---------------
 
@@ -44,7 +55,9 @@ Along with setPath(), there are a few other things you can do to customise ofxTe
 
 `setBlinkingCursor(bool b, float freq)` : freq is an optional argument and the default it 0.5Hz
 
-`ofxTerminal(T *co, string fp, int fs)` : Along with the pointer, the constructor can has two optional arguments, these are the font path and the font size, by default these are: "/System/Library/Fonts/Menlo.ttc" and 11 respectively. If you change these you will probably want to use a monospaced font.
+`ofxTerminal(T *co, string fontpath, int fontsize)` : Along with the pointer, the constructor can has two optional arguments, these are the font path and the font size, by default these are: "/System/Library/Fonts/Menlo.ttc" and 11 respectively. If you change these you will probably want to use a monospaced font.
+
+`setFontColor(int r, int g, int b)` & `setPromptColor(int r, int g, int b)` : these should be fairly self explanatory.
 
 If you do decide to change the default text, you might need to use:
 
