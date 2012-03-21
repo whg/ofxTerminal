@@ -24,10 +24,11 @@
  */
 
 
-#ifndef _OFX_TERMINAL
-#define _OFX_TERMINAL
+#pragma once
 
 #include "ofMain.h"
+
+#include <sstream>
 
 template <class T>
 class Function {
@@ -68,6 +69,7 @@ private:
 	unsigned char fontcolor[3];
 	bool ishidden;
 	float characterOffset, spaceOffset;
+	bool autocompleteflag;
 	
 	vector<string> lines, results;
 	vector<string> dictionary;
@@ -82,6 +84,9 @@ private:
 	void process(string command);
 	void explode(string command, char sep, vector<string> &tokens);
 	string execute(string command);
+	
+	void println(string line);
+	void incrementPrompt();
 		
 	T *callingObj;
 	
@@ -91,7 +96,6 @@ public:
 	void setup();
 	
 	void draw(int xOffset, int yOffset);
-	void update();
 	void keyPressed(int key);
 	
 	void addFunction(string name, string(T::*func)(vector<string> args));
@@ -160,6 +164,7 @@ void ofxTerminal<T>::setup() {
 	fontcolor[0] = fontcolor[1] = fontcolor[2] = 10;
 	prompt.color[0] = prompt.color[1] = prompt.color[2] = 50;
 	ishidden = false;
+	autocompleteflag = false;
 }
 
 
@@ -175,6 +180,7 @@ void ofxTerminal<T>::draw(int xOffset=0, int yOffset=-2) {
 
 	ofFill();
 	ofPushMatrix();
+	ofPushStyle();
 	ofTranslate(xOffset, screenYPos + yOffset);
 	
 	//this is where we draw all commands previous and present.
@@ -196,8 +202,12 @@ void ofxTerminal<T>::draw(int xOffset=0, int yOffset=-2) {
 	ofSetColor(prompt.color[0], prompt.color[1], prompt.color[2], blinker ? 100 : 0); //make the prompt a transparent grey
 	ofRect(stringWidth(prompt.PS1) + prompt.x, prompt.y, characterWidth, lineHeight);	
 	
+	ofPopStyle();
 	ofPopMatrix();
-	
+
+	//we can't use a modulus for this because we might miss the timing because of
+	//the framerate, so it's a little bit awkward, but i can't see how else to do it.
+	//...unless the blink is defined in terms of frames... but i prefers seconds
 	if (blinkCursor && ofGetElapsedTimeMillis() > blinkFrequency*1000+blinkCounter) {
 		blinker = !blinker;
 		blinkCounter+= blinkFrequency*1000;
@@ -228,14 +238,14 @@ void ofxTerminal<T>::keyPressed(int key) {
 	switch (key) {
 			
 		//space
-		case 32:
+		case ' ':
 			lines[cl].insert(it+prompt.index, (char) key);
 			prompt.x+= (spaceWidth);
 			prompt.index++;
 			break;
 			
 		// backspace
-		case 127:
+		case OF_KEY_BACKSPACE:
 			if (prompt.x > 0) {			
 				if (lines[cl].at(prompt.index-1) == ' ') prompt.x -= spaceWidth;
 				else prompt.x -= characterWidth;
@@ -245,7 +255,7 @@ void ofxTerminal<T>::keyPressed(int key) {
 			break;
 			
 		// left arrow
-		case 356:
+		case OF_KEY_LEFT:
 			if (prompt.x > 0) { // don't go too far...
 				if (lines[cl].at(prompt.index-1) == ' ') prompt.x -= spaceWidth;
 				else prompt.x -= characterWidth;
@@ -254,7 +264,7 @@ void ofxTerminal<T>::keyPressed(int key) {
 			break;
 			
 		//  right arrow
-		case 358:
+		case OF_KEY_RIGHT:
 			if (prompt.index < lines[cl].length()) { // can't go further than line
 				if (lines[cl].at(prompt.index) == ' ') prompt.x += spaceWidth;
 				else prompt.x += characterWidth;
@@ -263,7 +273,7 @@ void ofxTerminal<T>::keyPressed(int key) {
 			break;
 			
 		// up arrow - previous command
-		case 357:
+		case OF_KEY_UP:
 			//save the current command
 			if (prevCommand == 0) {
 				tempCommand = lines[cl];
@@ -278,7 +288,7 @@ void ofxTerminal<T>::keyPressed(int key) {
 			break;
 			
 		// down arrow
-		case 359:
+		case OF_KEY_DOWN	:
 			if (prevCommand > 0) {
 				prevCommand--;
 				lines[cl] = lines[cl-prevCommand];
@@ -292,10 +302,12 @@ void ofxTerminal<T>::keyPressed(int key) {
 			break;
 			
 		// esc, do nothing
-		case 27:
+		case OF_KEY_ESC:
 			break;
 			
 		//tab : autocomplete
+		//note: there is no OF_KEY for tab so, can't guarantee 
+		//any kind of cross platform compatibility
 		case 9: 
 		{	
 			//auto complete the word we are currently on, 
@@ -304,6 +316,8 @@ void ofxTerminal<T>::keyPressed(int key) {
 			int lastspace = todo.find_last_of(' ') + 1;
 			if (lastspace < 1) lastspace = 0;
 			todo = todo.substr(lastspace);
+			
+			vector<string> foundwords;
 			
 			//before any uber computer scientist has a go at me, 
 			//i don't think we are going to have a large dictionary so
@@ -317,35 +331,78 @@ void ofxTerminal<T>::keyPressed(int key) {
 					}
 				}
 				if (show) {
-					//change the command
-					string t = lines[cl].substr(0, lastspace) + dictionary[i] + " ";
-					lines[cl] = t + lines[cl].substr(prompt.index);
-					//add a space on to the end of the command... bash style
-					prompt.x = stringWidth(t);//move the prompt
-					prompt.index = t.length();
-					break;
+					foundwords.push_back(dictionary[i]);
 				}
 			}
+			
+			//if there is only one possibility then change the current line
+			if (foundwords.size() == 1) {
+				//change the command
+				string t = lines[cl].substr(0, lastspace) + foundwords[0];
+				
+				//only add a space at the end if we are at the end of the line
+				if (lines[cl].length() == prompt.index) {
+					t+= " ";
+				}
+				
+				//set the new line
+				lines[cl] = t + lines[cl].substr(prompt.index);
+
+				prompt.x = stringWidth(t);//move the prompt
+				prompt.index = t.length();
+			}
+			
+			//if we have multiple possible commands print them out in a list
+			//and then restore the prompt.
+			else if (foundwords.size() > 1) {
+				if (!autocompleteflag) {
+					autocompleteflag = true;
+					return;
+				}
+				stringstream ss;
+				for (int i = 0; i < foundwords.size(); i++) {
+					ss << foundwords[i] << " ";
+				}
+				
+				//save the current line
+				string templine = lines[cl];
+				int tempindex = prompt.index;
+				int tempx = prompt.x;
+				
+				//print the commands
+				println(ss.str());
+				
+				//restore the line
+				lines[cl] = templine;
+				prompt.index = tempindex;
+				prompt.x = tempx;
+				
+				autocompleteflag = false;
+			}
+			
+			
 		}
 		break;
 			
 		//enter, do things with current line
-		case 13:			
+		case OF_KEY_RETURN:			
 			//process the command
 			process(lines[cl]);
 			
-			//now do the housework
-			cl++;
-			prompt.index = 0;
-			prompt.x = 0;
-			prompt.y+= lineHeight;
-			prevCommand = 0;
 			break;
+		
+		//- - - control commands - - -
+		//no guarantee of cross platform compatibility, 
+		//though I am pretty sure these are standard to ASCII
 			
 		//control-c, clear the screen
 		case 3:			
 			//clear screen... but in reality just move things up... similar to clear in UNIX
 			screenYPos-= (screenYPos + prompt.y - prompt.yOffset);
+			break;
+		
+		case 22:
+			setup();
 			break;
 
 		//control-a, beginning of line
@@ -366,12 +423,18 @@ void ofxTerminal<T>::keyPressed(int key) {
 			prompt.index = 0;
 			lines[cl] = "";
 			break;
+			
+		//control-k, clear from point to end of line
+		case 11:
+			lines[cl] = lines[cl].substr(0, prompt.index);
+			break;
 
 		//control-h, toggle ishidden, which hides everything
 		case 8:
 			ishidden = !ishidden;
 			break;
 
+		
 		//all other keys...
 		//hopefully ofTrueTypeFont can draw them...
 		default:
@@ -386,7 +449,8 @@ void ofxTerminal<T>::keyPressed(int key) {
 }
 
 
-//my own version of ofTTF stringWidth()... seems to be bit more accurate as i've hardcoded the values
+//my own version of ofTTF stringWidth()... 
+//seems to be bit more accurate as i've hardcoded the values (spaceWidth & characterWidth)
 template <class T>
 int ofxTerminal<T>::stringWidth(string s) {
 	int x = 0;
@@ -404,25 +468,17 @@ void ofxTerminal<T>::process(string command) {
 	
 	//don't try and process an empty line
 	if (command != "") {
-		
-		string comment = "";
-		
+				
 		//execute the command...
 		//if your debugger brought you here, you need to return a string from your function
-		comment = execute(command);	  
+		string comment = execute(command);	  
 		
-		//show the comment if there is one and increment prompt.y
-		if (comment != "") {
-			results.push_back(comment);
-			//need an extra lineHeight added to prompt.y
-			prompt.y+= lineHeight;
-		}
-		
+		println(comment);
+		return;		
 	}
 	
-	//prepare for next line...
-	lines.push_back("");
-	results.push_back("");
+	incrementPrompt();
+	
 	
 }
 
@@ -436,13 +492,17 @@ string ofxTerminal<T>::execute(string command) {
 	explode(command, ' ', tokens);
 	
 	//if we have an empty line return nothing.. ie empty line
+	//this is just a safety precaution, i don't think execute is ever passed an empty string
 	if (!tokens.size()) {
 		return "";
 	}
 	
 	//the one built in function we have is read.
 	//this executes the contents of a specified file.
-	else if (tokens[0] == "read" && tokens.size() == 2) {
+	else if (tokens[0] == "read" ) {
+		if (tokens.size() != 2) {
+			return "usage: read filename";
+		}
 		if (readFile(tokens[1])) {
 			return "";	
 		}
@@ -461,8 +521,41 @@ string ofxTerminal<T>::execute(string command) {
 		}
 	}
 
+	//if we get to this point, we haven't found the command...
 	return tokens[0] + ": command not found";
 }
+
+/* - - - PROMPT STUFF - - - */
+//prints a results line if the argument is not and empty string
+//otherwise it just increments the prompt, ie incrementPrompt()
+
+template <class T>
+void ofxTerminal<T>::println(string line) {
+	//show the comment if there is one and increment prompt.y
+	if (line != "") {
+		results.push_back(line);
+		//need an extra lineHeight added to prompt.y
+		prompt.y+= lineHeight;
+		
+	}
+	incrementPrompt();
+}
+
+
+template <class T>
+void ofxTerminal<T>::incrementPrompt() {
+	//prepare for next line...
+	lines.push_back("");
+	results.push_back("");
+	
+	//now do the housework
+	cl++;
+	prompt.index = 0;
+	prompt.x = 0;
+	prompt.y+= lineHeight;
+	prevCommand = 0;
+}
+
 
 /* - - - ADDING STUFF - - - */
 
@@ -605,5 +698,3 @@ void ofxTerminal<T>::setPromptColor(int r, int g, int b) {
 	prompt.color[1] = g;
 	prompt.color[2] = b;
 }
-
-#endif

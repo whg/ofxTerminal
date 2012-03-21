@@ -58,6 +58,10 @@ void testApp::keyPressed(int key){
 }
 
 string testApp::setFrequency(vector<string> args) {
+	
+	if (args.size() < 1) {
+		return "usage: frequency f";
+	}
 
 	frequency = ofToFloat(args[0]);
 	return "";
