@@ -81,6 +81,7 @@ Changelog
 ---------
 
 21/3/12 
+
 * revamped autocomplete so multiple possibilities get printed out if tab is pressed twice
 * added C-v & C-k
 * changed keys to OF_KEY constants for better compatibility
