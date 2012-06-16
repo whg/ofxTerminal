@@ -92,10 +92,10 @@ private:
 	
 public:
 	ofxTerminal();
-	ofxTerminal(T *co, string fontpath, int fontsize);
+	ofxTerminal(T *co, string fontpath="/System/Library/Fonts/Menlo.ttc", int fontsize=11);
 	void setup();
 	
-	void draw(int xOffset, int yOffset);
+	void draw(int xOffset=0, int yOffset=-2);
 	void keyPressed(int key);
 	
 	void addFunction(string name, string(T::*func)(vector<string> args));
@@ -105,7 +105,7 @@ public:
 	void setPath(string s);
 	void setCharacterOffset(float v);
 	void setSpaceOffset(float v);
-	void setBlinkingCursor(bool b, float freq);
+	void setBlinkingCursor(bool b, float freq=0.5);
 	void setFontColor(int r, int g, int b);
 	void setPromptColor(int r, int g, int b);
 };
@@ -116,7 +116,7 @@ public:
 ////////////////////////////////////////
 
 template <class T>
-ofxTerminal<T>::ofxTerminal(T *co, string fontpath="/System/Library/Fonts/Menlo.ttc", int fontsize=11) {
+ofxTerminal<T>::ofxTerminal(T *co, string fontpath, int fontsize) {
 	
 	callingObj = co;
 	
@@ -154,7 +154,7 @@ void ofxTerminal<T>::setup() {
 	results.push_back("");
 	screenYPos = 0;
 	prevCommand = 0;
-	PATH = "/Users/WHG/Desktop/";
+	PATH = "/Users/WHG/Desktop/"; //hardcode your own path here...
 	spaceOffset = 0;
 	characterOffset = 2;
 	blinkCursor = false;
@@ -169,10 +169,10 @@ void ofxTerminal<T>::setup() {
 
 
 template <class T>
-void ofxTerminal<T>::draw(int xOffset=0, int yOffset=-2) {
+void ofxTerminal<T>::draw(int xOffset, int yOffset) {
 	
 	if (ishidden) return;
-		
+
 	//check to see if we need to move everything up to fit the new line
 	if (prompt.y+lineHeight > ofGetHeight() - screenYPos) {
 		screenYPos-= lineHeight;
@@ -677,8 +677,9 @@ void ofxTerminal<T>::setSpaceOffset(float v) {
 	spaceOffset = v;
 }
 
+//default freq = 0.5
 template <class T>
-void ofxTerminal<T>::setBlinkingCursor(bool b, float freq=0.5) {	
+void ofxTerminal<T>::setBlinkingCursor(bool b, float freq) {	
 	blinkCursor = b;
 	blinkFrequency = freq;
 	blinker = true; //setting this to true is quite important

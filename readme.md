@@ -75,7 +75,7 @@ Sometimes you might have various words that you use a lot and would like to auto
 Compatibility
 -------------
 
-I have only tested this on a Mac. 
+I have only tested this on a Mac, 10.6 & 10.7.
 
 Changelog
 ---------
@@ -85,7 +85,6 @@ Changelog
 * revamped autocomplete so multiple possibilities get printed out if tab is pressed twice
 * added C-v & C-k
 * changed keys to OF_KEY constants for better compatibility
-		
 	
 	
 	

@@ -25,11 +25,11 @@ void testApp::update(){
 }
 
 void testApp::draw(){
-	
+    ofBackground(255, 255, 255);
+
 	//we have to draw the terminal
-	terminal.draw();
+	terminal.draw(0, 0);
 	
-	ofBackground(255, 255, 255);
 	ofFill();
 	ofSetColor(0, 0, 0);
 	
@@ -95,6 +95,10 @@ string testApp::setSpeed(vector<string> args) {
 
 string testApp::blink(vector<string> args) {
 
+    if (args.size() != 1) {
+        return "usage: blink on|off";
+    }
+    
 	if (args[0] == "on") {
 		terminal.setBlinkingCursor(true);
 	}
