@@ -1,0 +1,7 @@
+
+*.DS_Store
+
+*.app
+*.build
+*.mode1v3
+*wng.pbxuser
