@@ -1,7 +1,14 @@
-
+# Mac specific
 *.DS_Store
 
+
+# xCode specific
 *.app
 *.build
 *.mode1v3
-*wng.pbxuser
+*.pbxuser
+
+
+# Visual Studio specific
+*.vcproj
+*.vcproj.user
